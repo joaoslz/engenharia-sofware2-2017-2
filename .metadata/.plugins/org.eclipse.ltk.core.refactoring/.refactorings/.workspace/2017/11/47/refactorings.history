@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">&#x0A;<refactoring comment="Rename resource &apos;minicurso_solid&apos; to &apos;01-minicurso_solid&apos;" description="Rename resource &apos;minicurso_solid&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="/minicurso_solid" name="01-minicurso_solid" stamp="1511100668065" updateReferences="true"/>&#x0A;<refactoring comment="Rename resource &apos;minicurso-teste&apos; to &apos;02-minicurso-teste-locadora&apos;" description="Rename resource &apos;minicurso-teste&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="/minicurso-teste" name="02-minicurso-teste-locadora" stamp="1511100767279" updateReferences="true"/>
+</session>
