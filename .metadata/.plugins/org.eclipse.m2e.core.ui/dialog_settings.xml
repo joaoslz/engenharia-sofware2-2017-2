@@ -2,6 +2,7 @@
 <section name="Workbench">
 	<section name="MavenProjectImportWizardPage">
 		<list key="rootDirectory">
+			<item value="/home/joao/eclipse-workspace/workspace-eng-software2/03-argentum"/>
 			<item value="/home/joao/eclipse-workspace/workspace-eng-software2/minicurso-teste"/>
 			<item value="/home/joao/eclipse-workspace/workspace-eng-software2/minicurso_solid"/>
 		</list>

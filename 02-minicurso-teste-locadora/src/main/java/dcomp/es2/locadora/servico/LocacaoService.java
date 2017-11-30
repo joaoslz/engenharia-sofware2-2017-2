@@ -1,34 +1,82 @@
 package dcomp.es2.locadora.servico;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.Date;
+import java.util.Arrays;
+import java.util.List;
 
 import dcomp.es2.locadora.modelo.Filme;
 import dcomp.es2.locadora.modelo.Locacao;
 import dcomp.es2.locadora.modelo.Usuario;
-import dcomp.es2.locadora.utils.DataUtils;
 
 
 public class LocacaoService {
 	
 	public Locacao alugarFilme(Usuario usuario, Filme filme) {
+		
 		if (filme.getEstoque() == 0) {
 			throw new RuntimeException("Sem Estoque");
 		}
 		
-		Locacao locacao = new Locacao();
-		locacao.setFilme(filme);
-		locacao.setUsuario(usuario);
-		locacao.setDataLocacao(LocalDate.now() );
-		locacao.setValor(filme.getPrecoLocacao());
+		return this.alugarFilmes(usuario, Arrays.asList(filme ));
+	}
+	
+	public Locacao alugarFilmes(Usuario usuario, List<Filme> filmes) {
+		
+		
+	   Locacao locacao = new Locacao();
+	   locacao.setFilmes(filmes );
+	   locacao.setUsuario(usuario);
+	   locacao.setDataLocacao(LocalDate.now() );
+	   
+	   
+	   LocalDate dataRetorno = LocalDate.now().plusDays(1);
+	   
+	   if (dataRetorno.getDayOfWeek() == DayOfWeek.SUNDAY ) {
+		   dataRetorno = dataRetorno.plusDays(1);
+	   }
+	   
+	   
+	   
+	   locacao.setDataRetorno(dataRetorno );
+	   
+	   
+		
+	   
+	   double valorTotal = calculaValorDaLocacao(filmes);
 
-		//Entrega no dia seguinte
-    	LocalDate amanha = LocalDate.now().plusDays(1);
-		locacao.setDataRetorno(amanha );
+       
+       locacao.setValor(valorTotal);
+		
 		
 		//Salvando a locacao...	
 		//TODO adicionar método para salvar
 		
 		return locacao;
 	}
+
+	private double calculaValorDaLocacao(List<Filme> filmes) {
+		double valorTotal = 0d;
+		   
+		   for(int i=1; i <= filmes.size(); i++) {
+			   double valorFilme = filmes.get(i-1).getPrecoLocacao();
+			   
+			   
+			   switch(i) {
+			   
+			   case 2: valorFilme = valorFilme * 0.90; break;
+			   case 3: valorFilme = valorFilme * 0.70; break;
+			   case 4: valorFilme = valorFilme * 0.50; break;
+
+			   
+			   }
+		 	   
+			   valorTotal += valorFilme;
+		   }
+		return valorTotal;
+	}
+	
+	
+	
+	
 }

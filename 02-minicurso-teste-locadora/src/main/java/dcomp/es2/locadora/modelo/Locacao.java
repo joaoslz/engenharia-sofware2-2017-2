@@ -1,15 +1,18 @@
 package dcomp.es2.locadora.modelo;
 
 import java.time.LocalDate;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Locacao {
 
 	private Usuario usuario;
-	private Filme filme;
+	
 	private LocalDate dataLocacao;
 	private LocalDate dataRetorno;
-	private Double valor;
+	private double valor;
+	
+	private List<Filme> filmes;
 	
 	public Usuario getUsuario() {
 		return usuario;
@@ -33,16 +36,24 @@ public class Locacao {
 	public void setDataRetorno(LocalDate dataRetorno) {
 		this.dataRetorno = dataRetorno;
 	}
-	public Double getValor() {
+	
+	public double getValor() {
 		return valor;
 	}
-	public void setValor(Double valor) {
+	
+	public void setValor(double valor) {
 		this.valor = valor;
 	}
-	public Filme getFilme() {
-		return filme;
+	
+	
+	public List<Filme> getFilmes() {
+		return filmes;
 	}
-	public void setFilme(Filme filme) {
-		this.filme = filme;
+	
+	public void setFilmes(List<Filme> filmes) {
+		this.filmes = filmes;
 	}
+	
+	
+	
 }
