@@ -899,3 +899,4 @@
 2017-11-30 18:14:21,127 [Worker-26] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 0 resource
 2017-11-30 18:14:21,128 [Worker-26] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
 2017-11-30 18:14:21,128 [Worker-26] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory /home/joao/eclipse-workspace/workspace-eng-software2/02-minicurso-teste-locadora/src/test/resources
+2017-12-01 09:41:41,479 [Worker-0] INFO  c.g.t.t.d.PublishedGradleVersions - Gradle version information cache is out-of-date. Trying to update.
