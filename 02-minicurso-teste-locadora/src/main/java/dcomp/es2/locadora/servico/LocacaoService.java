@@ -23,7 +23,6 @@ public class LocacaoService {
 	
 	public Locacao alugarFilmes(Usuario usuario, List<Filme> filmes) {
 		
-		
 	   Locacao locacao = new Locacao();
 	   locacao.setFilmes(filmes );
 	   locacao.setUsuario(usuario);
@@ -36,25 +35,21 @@ public class LocacaoService {
 		   dataRetorno = dataRetorno.plusDays(1);
 	   }
 	   
-	   
-	   
 	   locacao.setDataRetorno(dataRetorno );
-	   
-	   
-		
 	   
 	   double valorTotal = calculaValorDaLocacao(filmes);
 
-       
        locacao.setValor(valorTotal);
 		
 		
 		//Salvando a locacao...	
 		//TODO adicionar método para salvar
+       //daoLocacao.salva(locacao);
 		
 		return locacao;
 	}
 
+	
 	private double calculaValorDaLocacao(List<Filme> filmes) {
 		double valorTotal = 0d;
 		   

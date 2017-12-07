@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
 
+import dcomp.es2.locadora.builder.FilmeBuilder;
 import dcomp.es2.locadora.modelo.Filme;
 import dcomp.es2.locadora.modelo.Locacao;
 import dcomp.es2.locadora.modelo.Usuario;
@@ -28,44 +29,47 @@ import dcomp.es2.locadora.utils.DataUtils;
 public class LocacaoServiceTest {
 	
 	
-	private LocacaoService service;
+	private LocacaoService locacaoService;
 	private Usuario usuario;
 
-
+	
 	@Before
 	public void setup() {
-		service = new LocacaoService();
+		locacaoService = new LocacaoService();
 		usuario = new Usuario("Fulano");
 	}
-
 
 	@Test
 	public void testaUmaLocacao() {
 		
 		Assume.assumeFalse( LocalDate.now().getDayOfWeek() ==  DayOfWeek.SATURDAY );
 
-		
 		// cenário
-		Filme filme = new Filme("Batman o Retorno", 2, 5.0);
+		Filme filme = FilmeBuilder.umFilme().constroi();
+				
 
 		// ação
-		Locacao locacao = service.alugarFilme(usuario, filme);
+		Locacao locacao = locacaoService.alugarFilme(usuario, filme);
 
 		// verificação
 
-		Assert.assertThat(locacao.getValor(), is(equalTo(5.0)));
+		Assert.assertThat(locacao.getValor(), is(equalTo(4.0)));
 		Assert.assertThat(DataUtils.isMesmaData(locacao.getDataLocacao(), LocalDate.now() ), is(true) );
 		Assert.assertThat(DataUtils.isMesmaData(locacao.getDataRetorno(), DataUtils.amanha()), is(true) );
-	
 	}
 
 	
 	@Test(expected=RuntimeException.class)
 	public void naoDeveAlugarFilmeSemEstoque() {
 		
-		Filme filme = new Filme("Filme 1", 0, 5.0);
-		service.alugarFilme(usuario, filme);
+		Filme filme = FilmeBuilder
+		                .umFilme()
+		                .semEstoque()
+		                .constroi();
+		
+		locacaoService.alugarFilme(usuario, filme);
 
+		
 	}
 
 	
@@ -73,11 +77,11 @@ public class LocacaoServiceTest {
 	public void deveAplicarDesconto10PctNoSegundoFilme() {
 		
 		// cenário
-		List<Filme> filmes = Arrays.asList( new Filme("Filme 1", 5, 4.0),
-		                                    new Filme("Filme 2", 5, 4.0) );                
+		List<Filme> filmes = Arrays.asList( FilmeBuilder.umFilme().constroi(),
+				                            FilmeBuilder.umFilme().constroi());                
 		
 		//ação
-		Locacao locacao = service.alugarFilmes(usuario, filmes);
+		Locacao locacao = locacaoService.alugarFilmes(usuario, filmes);
 		
 		
 		// verificação
@@ -90,12 +94,12 @@ public class LocacaoServiceTest {
 	public void deveAplicarDesconto30PctNoTerceiroFilme() {
 		
 		// cenário
-		List<Filme> filmes = Arrays.asList( new Filme("Filme 1", 5, 4.0),
-                                            new Filme("Filme 2", 2, 4.0),
-                                            new Filme("Filme 3", 3, 4.0) );                
+		List<Filme> filmes = Arrays.asList( FilmeBuilder.umFilme().constroi(),
+				                            FilmeBuilder.umFilme().constroi(),
+				                            FilmeBuilder.umFilme().constroi() );                
 		
 		//ação
-		Locacao locacao = service.alugarFilmes(usuario, filmes);
+		Locacao locacao = locacaoService.alugarFilmes(usuario, filmes);
 		
 		
 		// verificação
@@ -110,13 +114,13 @@ public class LocacaoServiceTest {
 	public void deveAplicarDesconto50PctNoQuartoFilme() {
 		
 		// cenário
-		List<Filme> filmes = Arrays.asList( new Filme("Filme 1", 5, 4.0),
-                                            new Filme("Filme 2", 2, 4.0),
-                                            new Filme("Filme 3", 3, 4.0),                
-											new Filme("Filme 4", 3, 4.0) );                
+		List<Filme> filmes = Arrays.asList( FilmeBuilder.umFilme().constroi(),
+                                            FilmeBuilder.umFilme().constroi(),
+                                            FilmeBuilder.umFilme().constroi(),                
+											FilmeBuilder.umFilme().constroi() );                
 		
 		//ação
-		Locacao locacao = service.alugarFilmes(usuario, filmes);
+		Locacao locacao = locacaoService.alugarFilmes(usuario, filmes);
 		
 		
 		// verificação
@@ -138,7 +142,7 @@ public class LocacaoServiceTest {
 		Filme filme = new Filme("Batman o Retorno", 2, 5.0);
 
 		// ação
-		Locacao locacao = service.alugarFilme(usuario, filme);
+		Locacao locacao = locacaoService.alugarFilme(usuario, filme);
 		// verificação
 		LocalDate dataRetorno = locacao.getDataRetorno();
 		
