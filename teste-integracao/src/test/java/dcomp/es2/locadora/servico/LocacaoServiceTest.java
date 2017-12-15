@@ -2,18 +2,27 @@ package dcomp.es2.locadora.servico;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.mockito.Mockito.*;
-
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertEquals;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ErrorCollector;
+import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 
 import dcomp.es2.locadora.builder.FilmeBuilder;
@@ -23,13 +32,14 @@ import dcomp.es2.locadora.modelo.Filme;
 import dcomp.es2.locadora.modelo.Locacao;
 import dcomp.es2.locadora.modelo.Usuario;
 import dcomp.es2.locadora.repositorio.LocacaoRepository;
+import dcomp.es2.locadora.repositorio.UsuarioRepositoryImpl;
 import dcomp.es2.locadora.utils.DataUtils;
 
-public class LocacaoServiceTestV2 {
+public class LocacaoServiceTest {
 	
-	
-	private LocacaoServiceV2 locacaoService;
+	private LocacaoService locacaoService;
 	private Usuario usuario;
+	
 	private LocacaoRepository locacaoRepository;
 	private SPCService spcService;
 	private EmailService emailService;
@@ -37,18 +47,19 @@ public class LocacaoServiceTestV2 {
 	
 	@Before
 	public void setup() {
+		locacaoService = new LocacaoService();
 		usuario = UsuarioBuilder.umUsuario().constroi();
-
-		locacaoService = new LocacaoServiceV2();
+		
 		locacaoRepository = Mockito.mock(LocacaoRepository.class);
-		spcService = Mockito.mock(SPCService.class );
+		spcService = Mockito.mock(SPCService.class);
 		emailService = Mockito.mock(EmailService.class );
 		
-		locacaoService.setLocacaoRepository(locacaoRepository);
-		locacaoService.setSpcService(spcService);
+		locacaoService.setLocacaoRepository(locacaoRepository );
+		locacaoService.setSpcService(spcService );
 		locacaoService.setEmailService(emailService );
 	}
 
+	
 	@Test
 	public void testaUmaLocacao() {
 		
@@ -61,12 +72,14 @@ public class LocacaoServiceTestV2 {
 		Locacao locacao = locacaoService.alugarFilme(usuario, filme);
 
 		// verificação
+
 		Assert.assertThat(locacao.getValor(), is(equalTo(4.0)));
 		Assert.assertThat(DataUtils.isMesmaData(locacao.getDataLocacao(), LocalDate.now() ), is(true) );
 		Assert.assertThat(DataUtils.isMesmaData(locacao.getDataRetorno(), DataUtils.amanha()), is(true) );
 		
 		
 		Mockito.verify(locacaoRepository, Mockito.times(1)).salva(locacao);
+		
 	}
 
 	
@@ -79,14 +92,11 @@ public class LocacaoServiceTestV2 {
 		                .constroi();
 		
 		locacaoService.alugarFilme(usuario, filme);
-
-		
 	}
 
 	
 	@Test
 	public void deveAplicarDesconto10PctNoSegundoFilme() {
-		
 		// cenário
 		List<Filme> filmes = Arrays.asList( FilmeBuilder.umFilme().constroi(),
 				                            FilmeBuilder.umFilme().constroi());                
@@ -106,8 +116,10 @@ public class LocacaoServiceTestV2 {
 		List<Filme> filmes = Arrays.asList( FilmeBuilder.umFilme().constroi(),
 				                            FilmeBuilder.umFilme().constroi(),
 				                            FilmeBuilder.umFilme().constroi() );                
+		
 		//ação
 		Locacao locacao = locacaoService.alugarFilmes(usuario, filmes);
+		
 		
 		// verificação
 		// 4 + 4*90% + 4 * 0.70 = 4 + 3.60 + 2.80 = 10.40d
@@ -116,15 +128,17 @@ public class LocacaoServiceTestV2 {
 	}
 	
 	@Test
-	public void deveAplicar50PctDeDescontoNoQuartoFilme() {
+	public void deveAplicarDesconto50PctNoQuartoFilme() {
 		
 		// cenário
 		List<Filme> filmes = Arrays.asList( FilmeBuilder.umFilme().constroi(),
                                             FilmeBuilder.umFilme().constroi(),
                                             FilmeBuilder.umFilme().constroi(),                
 											FilmeBuilder.umFilme().constroi() );                
+		
 		//ação
 		Locacao locacao = locacaoService.alugarFilmes(usuario, filmes);
+		
 		
 		// verificação
 		// 4 + 4*90% + 4 * 0.70 = 4 + 3.60 + 2.80 + 2.0 = 12.40
@@ -154,47 +168,67 @@ public class LocacaoServiceTestV2 {
 				
 	}
 	
+	
 	@Test(expected=IllegalStateException.class)
-	public void naoDeveAlugarFilmeParaNegativadoNoSPC() {
+	public void naoDeveAlugarFilmeParaUsuarioNegativado() {
 		
+		Usuario usuario2 = UsuarioBuilder.umUsuario().comNome("Usuario Ok").constroi();
+				
 		Filme filme = FilmeBuilder.umFilme().constroi();
+	
+		Mockito.when(spcService.estaNegativado(usuario) ).thenReturn(true );
 		
-		//instrumentacao do mock
-		Mockito.when(spcService.possuiNegativacao(usuario)).thenReturn(true );
-		
-		// fazer um teste com usuario 2;
-		
-		locacaoService.alugarFilme(usuario, filme);
-		
-		
+		Locacao locacao = locacaoService.alugarFilme(usuario, filme);
 	}
 	
 	@Test
-	public void deveEnviarEmailParaLocacoesAtrasadas() {
+	public void deveEnviarEmailParaUsuariosAtrasados() {
 		
+		Usuario usuario1 = UsuarioBuilder.umUsuario().comNome("Usuario 1").constroi();
 		Usuario usuario2 = UsuarioBuilder.umUsuario().comNome("Usuario 2").constroi();
 		Usuario usuario3 = UsuarioBuilder.umUsuario().comNome("Usuario 3").constroi();
+
 		Usuario usuario4 = UsuarioBuilder.umUsuario().comNome("Usuario 4").constroi();
 		
-		List<Locacao> locacoes = Arrays.asList(LocacaoBuilder.umaLocacao().emAtraso().paraUsuario(usuario).constroi(),
-				                               LocacaoBuilder.umaLocacao().emAtraso().paraUsuario(usuario2).constroi(),
-				                               LocacaoBuilder.umaLocacao().emAtraso().paraUsuario(usuario3).constroi());
+		List<Locacao> locacoesEmAtraso = Arrays.asList( LocacaoBuilder.umaLocacao().paraUsuario(usuario1).emAtraso().constroi(),
+				                                LocacaoBuilder.umaLocacao().paraUsuario(usuario2).emAtraso().constroi(),
+				                                LocacaoBuilder.umaLocacao().paraUsuario(usuario3).emAtraso().constroi() );
 		
-		Mockito.when(locacaoRepository.getLocacoesPendentes() ).thenReturn(locacoes );
+		Mockito.when(locacaoRepository.buscaLocacoesEmAtraso()).thenReturn(locacoesEmAtraso );
 		
-		locacaoService.notificarAtrasos();
+		locacaoService.notificaUsuariosEmAtraso();
 		
-		Mockito.verify(emailService, times(1) ).notificarAtrasoDo(usuario);
-		Mockito.verify(emailService).notificarAtrasoDo(usuario2);
-		Mockito.verify(emailService).notificarAtrasoDo(usuario3);
-		Mockito.verify(emailService).notificarAtrasoDo(usuario3);
-
-		Mockito.verify(emailService, Mockito.never() ).notificarAtrasoDo(usuario4);
+		Mockito.verify(emailService, Mockito.times(1)).notifica(usuario1);
+		Mockito.verify(emailService, Mockito.times(1)).notifica(usuario2);
+		Mockito.verify(emailService, Mockito.times(1)).notifica(usuario3);
+		
+		Mockito.verify(emailService, Mockito.never() ).notifica(usuario4);
 		
 		Mockito.verifyNoMoreInteractions(emailService );
 		
-		
 	}
 	
+	
+    @Test
+    public void deveEncontrarUsuarioPeloNomeMockado() {
+        EntityManager manager = Mockito.mock(EntityManager.class);
+        Query query = Mockito.mock(Query.class);
+        UsuarioRepositoryImpl usuarios = new UsuarioRepositoryImpl(manager);
 
+        Usuario usuario = new Usuario
+                ("João da Silva");
+        String sql = "from Usuario u where u.nome = :nome and x.email = :email";
+
+        Mockito.when(manager.createQuery(sql)).thenReturn(query);
+        Mockito.when(query.getSingleResult()).thenReturn(usuario);
+        Mockito.when(query.setParameter("nome", "João da Silva")).thenReturn(query);
+
+        Usuario usuarioDoBanco = usuarios.porNome("João da Silva");
+
+        Assert.assertThat(usuario.getNome(), is(equalTo(usuarioDoBanco.getNome()) ));
+    }
+		
+		
+		
+	
 }

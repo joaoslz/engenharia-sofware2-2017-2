@@ -3,7 +3,6 @@
 <fullyQualifiedTypeName name="java.util.List"/>
 <fullyQualifiedTypeName name="dcomp.es2.locadora.builder.FilmeBuilder"/>
 <fullyQualifiedTypeName name="dcomp.es2.locadora.repositorio.LocacaoRepository"/>
-<fullyQualifiedTypeName name="java.lang.IllegalArgumentException"/>
 <fullyQualifiedTypeName name="dcomp.es2.locadora.servico.SPCService"/>
 <fullyQualifiedTypeName name="java.lang.IllegalStateException"/>
 <fullyQualifiedTypeName name="org.junit.Test"/>
@@ -16,4 +15,5 @@
 <fullyQualifiedTypeName name="dcomp.es2.locadora.servico.EmailService"/>
 <fullyQualifiedTypeName name="org.mockito.Mockito"/>
 <fullyQualifiedTypeName name="dcomp.es2.locadora.builder.UsuarioBuilder"/>
+<fullyQualifiedTypeName name="java.lang.IllegalArgumentException"/>
 </qualifiedTypeNameHistroy>

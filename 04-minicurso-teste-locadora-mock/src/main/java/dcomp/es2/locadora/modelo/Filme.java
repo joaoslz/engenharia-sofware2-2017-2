@@ -9,6 +9,10 @@ public class Filme {
 	public Filme() {}
 	
 	public Filme(String nome, Integer estoque, Double precoLocacao) {
+		
+		if (precoLocacao < 0) {
+			throw new IllegalArgumentException("Preço da locação não pode ser negativo");
+		}
 		this.nome = nome;
 		this.estoque = estoque;
 		this.precoLocacao = precoLocacao;
