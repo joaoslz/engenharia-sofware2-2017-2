@@ -1,0 +1,14 @@
+Official Selenium Blog
+	https://seleniumhq.wordpress.com/2016/10/13/selenium-3-0-out-now/
+	
+Recomendação do W3C do webdriver
+	https://www.w3.org/TR/webdriver/	
+	
+	
+Drivers
+  chrome: https://sites.google.com/a/chromium.org/chromedriver/downloads
+  Firefox: https://github.com/mozilla/geckodriver/releases
+  Internet explorer: http://selenium-release.storage.googleapis.com/index.html?path=3.4/
+  
+  
+	
